@@ -1,0 +1,14 @@
+<style>
+</style>
+
+<template>
+  <view class="container">My page</view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class User extends wepy.page {
+
+  }
+</script>
