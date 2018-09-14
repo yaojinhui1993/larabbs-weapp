@@ -1,4 +1,18 @@
 <style lang="less">
+.avatar {
+  width: 80px;
+  height: 80px;
+  display: block;
+  border-radius: 50%;
+}
+
+.avatar-wrap {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .introduction {
   height: 3.3em;
 }
@@ -11,6 +25,9 @@
   <view class="page">
     <view class="page__bd">
       <form bindsubmit="submit">
+        <view class="avatar-wrap">
+          <image class="avatar" src="{{ user.avatar }}" @tap="updateAvatar" />
+        </view>
         <view class="weui-cells__title">姓名</view>
         <view class="weui-cells weui-cells_after-title">
           <view class="weui-cell weui-cell_input">
@@ -70,7 +87,8 @@
 
     data = {
       user: null,
-      errors: null
+      errors: null,
+      avatarId: 0
     }
 
     async onShow() {
@@ -81,10 +99,16 @@
     async submit({ detail }) {
       this.errors = null
 
+      let formData = detail.value
+
+      if (this.avatarId !== 0) {
+        formData.avatar_image_id = this.avatarId
+      }
+
       let { statusCode, data } = await api.authRequest({
         url: 'user',
         method: 'PUT',
-        data: detail.value
+        data: formData
       })
 
       if (statusCode === 422) {
@@ -102,6 +126,33 @@
           'icon': 'success',
           'duration': 2000
         })
+      }
+    }
+
+    methods = {
+      async updateAvatar(e) {
+        let image = await wepy.chooseImage({
+          count: 1
+        })
+
+        let avatar = image.tempFilePaths[0]
+
+        let { statusCode, data } = await api.uploadFile({
+          url: 'images',
+          method: 'POST',
+          name: 'image',
+          formData: {
+            type: 'avatar'
+          },
+          filePath: avatar
+        })
+
+        if (statusCode === 201) {
+          let { path, id } = JSON.parse(data)
+          this.user.avatar = path
+          this.avatarId = id
+          this.$apply()
+        }
       }
     }
   }
