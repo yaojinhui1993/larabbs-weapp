@@ -26,7 +26,7 @@
   <view class="page">
     <view class="page__bd">
       <view class="weui-cells weui-cells_after-title">
-        <navigator class="weui-cell" wx:if="{{ user }}" url>
+        <navigator class="weui-cell" wx:if="{{ user }}" url="/pages/users/edit">
           <view class="weui-cell__hd avatar-wrap">
             <image class="avatar" src="{{ user.avatar }}" />
           </view>
@@ -70,7 +70,7 @@
       </view>
 
       <view class="page__bd page__bd_spacing logout">
-        <button class="weui-btn" type="warn" wx:if="{{ user }}">退款登录</button>
+        <button class="weui-btn" type="warn" wx:if="{{ user }}" @tap="logout">退款登录</button>
       </view>
     </view>
   </view>
@@ -80,7 +80,7 @@
 import wepy from 'wepy'
 import api from '@/utils/api'
 
-export default class User extends wepy.page {
+export default class UserMe extends wepy.page {
   config = {
     navigationBarTitleText: '我的'
   }

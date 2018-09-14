@@ -1,0 +1,108 @@
+<style lang="less">
+.introduction {
+  height: 3.3em;
+}
+.error-message {
+  color: #E64340;
+}
+</style>
+
+<template>
+  <view class="page">
+    <view class="page__bd">
+      <form bindsubmit="submit">
+        <view class="weui-cells__title">姓名</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__bd">
+              <input class="weui-input" placeholder="请输入姓名" name="name" value="{{ user.name }}" />
+            </view>
+            <view class="weui-cell__ft" wx:if="{{ errors.name }}" >
+              <icon type="warn" size="23" color="#E64340"></icon>
+            </view>
+          </view>
+        </view>
+        <view class="weui-cells__tips error-message">{{ errors.name[0] }}</view>
+
+        <view class="weui-cells__title">邮箱</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__bd">
+              <input class="weui-input" placeholder="请输入邮箱" name="email" value="{{ user.email }}" />
+            </view>
+            <view class="weui-cell__ft" wx:if="{{ errors.email }}">
+              <icon type="warn" size="23" color="#E64340"></icon>
+            </view>
+          </view>
+        </view>
+        <view class="weui-cells__tips error-message">{{ errors.email[0] }}</view>
+
+        <view class="weui-cells__title">个人简介</view>
+        <view class="weui-cells weui-cells_after-title">
+          <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__bd">
+              <textarea class="weui-textarea introduction" placeholder="请输入简介" name="introduction" value="{{ user.introduction }}" />
+            </view>
+            <view class="weui-cell__ft" wx:if="{{ errors.introduction }}">
+              <icon type="warn" size="23" color="#E64340"></icon>
+            </view>
+          </view>
+        </view>
+        <view class="weui-cells__tips error-message">{{ errors.introduction[0] }}</view>
+
+        <view class="weui-btn-area">
+          <button class="weui-btn" type="primary" formType="submit">修改</button>
+        </view>
+
+      </form>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '@/utils/api'
+
+  export default class UserEdit extends wepy.page {
+    config = {
+      navigationBarTitleText: '修改个人信息'
+    }
+
+    data = {
+      user: null,
+      errors: null
+    }
+
+    async onShow() {
+      this.user = await this.$parent.getCurrentUser()
+      this.$apply()
+    }
+
+    async submit({ detail }) {
+      this.errors = null
+
+      let { statusCode, data } = await api.authRequest({
+        url: 'user',
+        method: 'PUT',
+        data: detail.value
+      })
+
+      if (statusCode === 422) {
+        this.errors = data.errors
+        this.$apply()
+      }
+
+      if (statusCode === 200) {
+        this.user = data
+        wepy.setStorageSync('user', data)
+        this.$apply()
+
+        wepy.showToast({
+          'title': '修改成功',
+          'icon': 'success',
+          'duration': 2000
+        })
+      }
+    }
+  }
+</script>
