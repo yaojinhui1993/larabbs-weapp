@@ -16,14 +16,20 @@
 ## Phone Register
 
 * The register flow
-    1. User get verification code
+  1. User get verification code
       1. User fill captcha
       2. User Send the filled captcha code
       3. Server verify the code, and send SMS to the user
-    2. User fill verification code and other form inputs
-    3. User send form data
-    4. Server register the user
+  2. User fill verification code and other form inputs
+  3. User send form data
+  4. Server register the user
 * `showToast`
 * `setStorageSync`
 * `switchTab`
 * `modal`
+
+## User
+
+* Add global method `checkLogin` and `getCurrentUser` in `app.wpy`, and use `this.$parent.getCurrentUser` invoke these methods.
+* Use `wepy.uploadFile()` to send file to server
+* Use `wepy.chooseImage` to select files.
