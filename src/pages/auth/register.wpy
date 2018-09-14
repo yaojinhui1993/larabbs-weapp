@@ -1,0 +1,125 @@
+<style>
+.register-wrap {
+  margin-top: 50px;
+}
+
+.error-message {
+  color: #e64340
+}
+</style>
+
+
+<template>
+  <view class="page">
+    <view class="page__bd register_wrap">
+      <form bindsubmit="submit">
+        <view class="weui-toptips toptips_warn" wx:if="{{ errorMessage }}">
+          {{ errorMessage }}
+        </view>
+
+        <view class="weui-cells__title">
+          Larabbs 手机注册
+        </view>
+
+        <view class="weui-cells__title {{ errors.phone ? 'weui-cell_warn' : '' }}">手机号</view>
+        <view class="weui-cells weui-cells_after-tittle">
+          <view class="weui-cell weui-cell_input {{ errors.phone ? 'weui-cell_warn' : ''}}">
+            <view class="weui-cell__bd">
+              <input disabled="{{ phoneDisabled }}" class="weui-input" type="number" placeholder="请输入手机号" @input="bindPhoneInput"/>
+            </view>
+            <view class="weui-cell__ft">
+              <icon wx:if="{{ errors.phone }}" type="warn" size="23" color="#E64340"></icon>
+              <view class="weui-vcode-btn" @tap="tapCaptchaCode">获取验证码</view>
+            </view>
+          </view>
+        </view>
+        <view wx:if="{{ errors.phone }}" class="weui-cells__tips error-message">{{ errors.phone[0] }}</view>
+
+        <view class="weui-btn-area">
+          <button class="weui-btn" type="primary" formType="submit">注册</button>
+        </view>
+      </form>
+
+      <modal class="modal" hidden="{{ captchaModalHidden }}" no-cancel bindconfirm="sendVerificationCode">
+        <view wx:if="{{ errors.captchaValue }}" class="weui-cells__tips error-message">{{ errors.captchaValue[0] }}</view>
+        <view class="weui-cell weui-cell__input weui-cell_vcode">
+          <view class="weui-cell__bd">
+            <input class="weui-input" placeholder="图片验证码" @input="bindCaptchaCodeInput" />
+          </view>
+
+          <view class="weui-cell__ft">
+            <image class="weui-vcode-img" @tap="tapCaptchaCode" src="{{ captcha.imageContent }}" style="width: 100px" />
+          </view>
+        </view>
+      </modal>
+
+
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/utils/api'
+
+export default class Register extends wepy.page {
+  config = {
+    navigationBarTitleText: '注册'
+  }
+
+  data = {
+    phone: '',
+    phoneDisabled: false,
+    captchaModalHidden: true,
+    captchaValue: null,
+    captcha: {},
+    errors: {}
+  }
+
+  async getCaptchaCode() {
+    this.errors.phone = null
+
+    if (!(/^1[34578]\d{9}$/.test(this.phone))) {
+      this.errors.phone = ['请输入正确的手机号']
+      this.$apply()
+      return false
+    }
+
+    let { statusCode, data } = await api.request({
+      url: 'captchas',
+      method: 'POST',
+      data: {
+        phone: this.phone
+      }
+    })
+
+    if (statusCode === 422) {
+      this.errors = data.errors
+      this.$apply()
+    }
+
+    if (statusCode === 201) {
+      this.captcha = {
+        key: data.captcha_key,
+        imageContent: data.captcha_image_content,
+        expireAt: Date.parse(data.expired_at)
+      }
+
+      this.captchaModalHidden = false
+      this.$apply()
+    }
+  }
+
+  methods = {
+    bindPhoneInput(e) {
+      this.phone = e.detail.value
+    },
+    bindCaptchaCodeInput(e) {
+      this.captchaValue = e.detail.value
+    },
+    async tapCaptchaCode() {
+      this.getCaptchaCode()
+    }
+  }
+}
+</script>
