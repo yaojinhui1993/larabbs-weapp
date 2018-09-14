@@ -1,4 +1,4 @@
-import wepy from 'wepy';
+import wepy from 'wepy'
 
 const host = 'http://larabbs.test/api'
 
@@ -47,7 +47,77 @@ const login = async (params = {}) => {
   return authResponse
 }
 
+const refreshToken = async (accessToken) => {
+  let { statusCode, data } = await request({
+    url: 'authorizations/current',
+    method: 'PUT',
+    header: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+
+  if (statusCode === 200) {
+    wepy.setStorageSync('access_token', data.access_token)
+    wepy.setStorageSync('access_token_expired_at', new Date().getTime() + data.expires_in * 1000)
+  }
+
+  return { statusCode, data }
+}
+
+const getToken = async (options) => {
+  let accessToken = wepy.getStorageSync('access_token')
+  let expiredAt = wepy.getStorageSync('access_token_expired_at')
+
+  if (accessToken && new Date().getTime() > expiredAt) {
+    let { statusCode, data } = await refreshToken(accessToken)
+
+    if (statusCode === 200) {
+      accessToken = data.access_token
+    } else {
+      let { statusCode, data } = await login()
+      if (statusCode === 201) {
+        accessToken = data.access_token
+      }
+    }
+  }
+
+  return accessToken
+}
+
+const authRequest = async (options, showLoading = true) => {
+  if (typeof options === 'string') {
+    options = {
+      url: options
+    }
+  }
+
+  let accessToken = await getToken()
+
+  let header = options.header || {}
+  header.Authorization = `Bearer ${accessToken}`
+  options.header = header
+
+  return request(options, showLoading)
+}
+
+const logout = async (params = {}) => {
+  let { statusCode, data } = await authRequest({
+    url: 'authorizations/current',
+    method: 'DELETE'
+  })
+
+  if (statusCode === 204) {
+    wepy.clearStorage()
+  }
+
+  return { statusCode, data }
+}
+
 export default {
   request,
-  login
+  login,
+  refreshToken,
+  getToken,
+  authRequest,
+  logout
 }
