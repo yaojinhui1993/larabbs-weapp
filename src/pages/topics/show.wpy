@@ -15,6 +15,14 @@
   .topic-title {
     padding: 15px;
   }
+
+  .create-reply {
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+  }
 </style>
 
 <template>
@@ -75,6 +83,10 @@
         </navigator>
       </view>
     </view>
+
+    <navigator url="/pages/replies/create?topic_id={{ topic.id }}">
+      <image src="/images/reply.png" class="create-reply" />
+    </navigator>
   </view>
 </template>
 
@@ -134,7 +146,7 @@ export default class TopicShow extends wepy.page {
     this.$apply()
   }
 
-  methods = {
+  methods ={
     async deleteTopic() {
       let res = await wepy.showModal({
         title: '确认删除',
@@ -175,6 +187,14 @@ export default class TopicShow extends wepy.page {
         }, 2000)
       }
     }
+  }
+
+  async onShow() {
+    this.$parent.checkRefreshPages(
+      this.getCurrentPages().pop().route, () => {
+        this.getTopic(this.topic.id)
+      }
+    )
   }
 }
 </script>
