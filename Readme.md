@@ -33,3 +33,12 @@
 * Add global method `checkLogin` and `getCurrentUser` in `app.wpy`, and use `this.$parent.getCurrentUser` invoke these methods.
 * Use `wepy.uploadFile()` to send file to server
 * Use `wepy.chooseImage` to select files.
+
+## Topics
+
+* Topic's index, show, delete pages and actions
+* Pull down refresh
+* Pull up load more
+* Navigator open types
+* Component
+* Global data
