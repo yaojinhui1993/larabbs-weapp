@@ -112,7 +112,7 @@
       <view class="weui-panel weui-panel__access">
         <view class="weui-panel__bd">
           <repeat for="{{ topics }}" key="{{ topic.id }}" item="topic" index="index">
-            <navigator url="" class="weui-media-box weui-media-box__appmsg" hover-class="weui-cell_active">
+            <navigator url="/pages/topics/show?id={{ topic.id }}" class="weui-media-box weui-media-box__appmsg" hover-class="weui-cell_active">
               <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
                 <image class="weui-media-box__thumb" src="{{ topic.user.avatar }}" />
               </view>
