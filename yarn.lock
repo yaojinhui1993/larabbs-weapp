@@ -1476,6 +1476,10 @@ mkdirp@^0.5.0, mkdirp@^0.5.1:
   dependencies:
     minimist "0.0.8"
 
+moment@^2.22.2:
+  version "2.22.2"
+  resolved "http://registry.npm.taobao.org/moment/download/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
+
 ms@2.0.0:
   version "2.0.0"
   resolved "http://registry.npm.taobao.org/ms/download/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
@@ -1979,7 +1983,7 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-wepy-async-function@^1.4.4:
+wepy-async-function@^1.4.6:
   version "1.4.6"
   resolved "http://registry.npm.taobao.org/wepy-async-function/download/wepy-async-function-1.4.6.tgz#b650c3d46ddea54404ba1e005e0b949897c69804"
   dependencies:
