@@ -109,6 +109,8 @@ export default class extends wepy.app {
   onLaunch() {
     this.updateUnreadCount()
     setInterval(() => this.updateUnreadCount(), 60000)
+
+    this.getPerms()
   }
 
   checkLogin() {
@@ -144,6 +146,32 @@ export default class extends wepy.app {
     if (statusCode === 200) {
       this.globalData.unreadCount = data.unread_count
     }
+  }
+
+  async getPerms() {
+    let perms = []
+
+    if (!this.checkLogin) {
+      return perms
+    }
+
+    let { statusCode, data } = await api.authRequest('user/permissions', false)
+    if (statusCode === 200) {
+      perms = data.data
+      wepy.setStorageSync('perms', perms)
+    }
+
+    return perms
+  }
+
+  can(targetPerm) {
+    if (!this.checkLogin()) {
+      return false
+    }
+
+    let perms = wepy.getStorageSync('perms') || []
+
+    return (perms.find(perm => perm.name === targetPerm))
   }
 }
 </script>

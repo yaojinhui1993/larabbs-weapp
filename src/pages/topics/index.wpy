@@ -88,7 +88,7 @@
 
 <script>
   import wepy from 'wepy'
-  import { request } from '@/utils/api'
+  import api from '@/utils/api'
   import topicList from '@/components/topicList'
   import unreadCount from '@/mixins/unreadCount'
 
@@ -134,7 +134,7 @@
     async getCategories() {
       let categories = wepy.getStorageSync('categories')
       if (!categories) {
-        let { statusCode, data } = await request('categories')
+        let { statusCode, data } = await api.request('categories')
         if (statusCode === 200) {
           categories = data.data
           wepy.setStorageSync('categories', categories)
