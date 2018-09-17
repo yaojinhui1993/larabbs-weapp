@@ -90,6 +90,7 @@
   import wepy from 'wepy'
   import { request } from '@/utils/api'
   import topicList from '@/components/topicList'
+  import unreadCount from '@/mixins/unreadCount'
 
   export default class Index extends wepy.page {
     config = {
@@ -104,6 +105,8 @@
       categoryOpen: false,
       requestData: {}
     }
+
+    mixins = [ unreadCount ]
 
     components = {
       topiclist: topicList
