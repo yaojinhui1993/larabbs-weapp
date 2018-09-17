@@ -155,5 +155,11 @@
     async onReachBottom () {
       this.$invoke('topiclist', 'loadMore')
     }
+
+    onShow() {
+      this.$parent.checkRefreshPages(this.getCurrentPages().pop().route, () => {
+        this.$invoke('topiclist', 'reload')
+      })
+    }
   }
 </script>

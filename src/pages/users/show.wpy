@@ -84,7 +84,7 @@ export default class userShow extends wepy.page {
 
       this.$apply()
       wepy.setNavigationBarTitle({
-        thitle: `${this.user.name} 的主页`
+        title: `${this.user.name} 的主页`
       })
     }
   }

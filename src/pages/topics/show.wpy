@@ -43,6 +43,8 @@
     </view>
     <view class="weui-article">
       <rich-text nodes="{{ topic.body }}" bindtap="tap"></rich-text>
+
+      <button wx:if="{{ canDelete }}" @tap="deleteTopic" class="weui-btn mini-btn" type="default" size="mini">删除</button>
     </view>
   </view>
 </template>
@@ -58,7 +60,18 @@ export default class TopicShow extends wepy.page {
   }
 
   data = {
-    topic: null
+    topic: null,
+    user: null
+  }
+
+  computed = {
+    canDelete() {
+      if (!this.topic || !this.user) {
+        return false
+      }
+
+      return this.topic.user.id === this.user.id
+    }
   }
 
   async getTopics(id) {
@@ -75,9 +88,54 @@ export default class TopicShow extends wepy.page {
     this.$apply()
   }
 
-  onLoad(options) {
-    console.log('on load')
-    this.getTopics(options.id)
+  async onLoad(options) {
+    await this.getTopics(options.id)
+
+    this.user = await this.$parent.getCurrentUser()
+    this.$apply()
+  }
+
+  methods = {
+    async deleteTopic() {
+      let res = await wepy.showModal({
+        title: '确认删除',
+        content: '您确认删除该话题吗？',
+        confirmText: '删除',
+        cancelText: '取消'
+      })
+
+      if (!res.confirm) {
+        return false
+      }
+
+      let { statusCode } = await api.authRequest({
+        url: `topics/${this.topic.id}`,
+        method: 'DELETE'
+      })
+
+      if (statusCode === 204) {
+        wepy.showToast({
+          title: '删除成功',
+          icon: 'success'
+        })
+
+        let pages = this.getCurrentPages()
+        if (pages.length > 1) {
+          let refreshPages = []
+          pages.forEach((page) => {
+            if (page.route === 'pages/topics/index' || page.route === 'pages/topics/userIndex') {
+              refreshPages.push(page.route)
+            }
+          })
+          this.$parent.globalData.refreshPages = this.$parent.globalData.refreshPages.concat(refreshPages)
+          this.$apply()
+        }
+
+        setTimeout(() => {
+          wepy.navigateBack()
+        }, 2000)
+      }
+    }
   }
 }
 </script>
