@@ -25,8 +25,12 @@ export default class replyMixin extends wepy.mixin {
 
     if (statusCode === 200) {
       let replies = data.data
+
+      let user = await this.$parent.getCurrentUser()
       replies.forEach(reply => {
         reply.created_at_diff = util.diffForHumans(reply.created_at)
+
+        reply.can_delete = this.canDelete(user, reply)
       })
 
       this.replies = reset ? replies : [...this.replies, ...replies]
@@ -58,5 +62,47 @@ export default class replyMixin extends wepy.mixin {
     await this.getReplies()
     this.isLoading = false
     this.$apply()
+  }
+
+  canDelete(user, reply) {
+    if (!user) {
+      return false
+    }
+
+    return reply.user_id === user.id
+  }
+
+  methods = {
+    async deleteReply({topic_id: topicId, id: replyId}) {
+      let res = await wepy.showModal({
+        title: '确认删除',
+        content: '您确认删除该回复吗',
+        confirm: '删除',
+        cancelText: '取消'
+      })
+
+      if (!res.confirm) {
+        return
+      }
+
+      let { statusCode, data } = await api.authRequest({
+        url: `topics/${topicId}/replies/${replyId}`,
+        method: 'DELETE'
+      })
+
+      if (statusCode === 204) {
+        wepy.showToast({
+          title: '删除成功',
+          icon: 'success',
+          duration: 2000
+        })
+
+        this.replies = this.replies.filter((reply) => reply.id !== replyId)
+        this.$apply()
+      }
+
+      return { statusCode, data }
+    }
+
   }
 }

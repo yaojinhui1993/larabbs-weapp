@@ -19,7 +19,7 @@
                 <image class="replyer-avatar weui-media-box__thumb" src="{{ reply.user.avatar }}" />
               </view>
 
-              <navigator class="weui-media-box__bd weui-media-box__bd_in-appmsg" url="pages/topics/show?id={{ reply.topic_id }}">
+              <navigator class="weui-media-box__bd weui-media-box__bd_in-appmsg" url="/pages/topics/show?id={{ reply.topic_id }}">
                 <view class="weui-media-box__title">{{ reply.topic.title }}</view>
                 <view class="weui-media-box__desc">
                   <rich-text nodes="{{ reply.content }}" bindtap="tap"></rich-text>
