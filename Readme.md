@@ -48,3 +48,9 @@
 * Replies' index, create, delete
 * `Mixins`
 * Show notifications
+
+## Misc
+
+* User Permissions
+* Share
+* Deploy
